@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #0A1F44;
+  --color-navy-700: #0d2a5e;
+  --color-navy-light: #1565C0;
+  --color-navy-50: #EEF2F9;
+  --color-navy-100: #d4deef;
+  --color-panel: #F7F8FA;
+  --color-sidebar-bg: #F0F2F5;
+  --color-border: #E2E6EA;
+  --color-green-status: #1B8A4C;
+  --color-green-light: #DCFCE7;
+  --color-amber-status: #D97706;
+  --color-amber-light: #FEF3C7;
+  --color-red-status: #C62828;
+  --color-red-light: #FEE2E2;
+  --color-gray-muted: #6B7280;
+
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #FFFFFF;
+  color: #1a1a2e;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F0F2F5;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Toggle switch */
+.toggle-track {
+  transition: background-color 300ms ease;
+}
+.toggle-thumb {
+  transition: transform 300ms ease;
+}
+
+/* Sparkline animation */
+@keyframes drawLine {
+  from { stroke-dashoffset: 100%; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Pulse dot */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.4); }
+}
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Feed line slide-in */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.slide-in {
+  animation: slideInRight 0.3s ease forwards;
+}
+
+/* Chart reveal */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fadeUp 0.4s ease forwards;
+}
+
+/* Modal */
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.modal-enter {
+  animation: modalIn 0.2s ease forwards;
+}
+
+/* Page transition */
+@keyframes pageSlideIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.page-enter {
+  animation: pageSlideIn 0.25s ease forwards;
+}
+
+/* Sidebar active indicator */
+.sidebar-active-bar {
+  transition: all 0.2s ease;
+}
+
+/* Number font */
+.font-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+.font-mono {
+  font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+}
