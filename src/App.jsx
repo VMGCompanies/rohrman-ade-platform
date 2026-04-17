@@ -10,7 +10,9 @@ import {
   DollarSign, Zap, Database, Search, Filter, Download, Plus,
   Edit2, X, RefreshCw, ExternalLink, Shield, Activity,
   FileText, ArrowLeft, Layers, Send, Pin, Info, ChevronUp,
-  Calendar, User
+  Calendar, User, Play, Pause, StepForward, StepBack, RotateCcw,
+  Cpu, Brain, Eye, GitBranch, MessageSquare, Mic, Flag, UserCheck,
+  FastForward, FileEdit, Terminal, CircleDot
 } from 'lucide-react';
 
 // ── CONSTANTS ────────────────────────────────────────────────────────────────
@@ -213,6 +215,225 @@ const ATLAS_QUERIES = [
   "Compare service absorption rate YoY by store",
   "Total new vs. used gross by store MTD",
 ];
+
+// ── AUTONOMOUS PROCESS DEFINITIONS ──────────────────────────────────────────
+// Realistic, stepped AI workflows the customer can play / pause / step through.
+// Each step models a real systems call, LLM reasoning, or human checkpoint.
+
+const STEP_TYPES = {
+  system:   { label: 'System',    color: '#6B7280', bg: '#F3F4F6', icon: 'Cpu' },
+  read:     { label: 'Read',      color: '#1565C0', bg: '#EFF6FF', icon: 'Database' },
+  llm:      { label: 'Reasoning', color: '#7C3AED', bg: '#F3E8FF', icon: 'Brain' },
+  listen:   { label: 'Listen',    color: '#0891B2', bg: '#ECFEFF', icon: 'Mic' },
+  score:    { label: 'Score',     color: '#1B8A4C', bg: '#DCFCE7', icon: 'Activity' },
+  decision: { label: 'Decision',  color: '#D97706', bg: '#FEF3C7', icon: 'GitBranch' },
+  write:    { label: 'Write',     color: '#0A1F44', bg: '#EEF2F9', icon: 'FileEdit' },
+  send:     { label: 'Send',      color: '#1565C0', bg: '#EFF6FF', icon: 'Send' },
+  human:    { label: 'Checkpoint',color: '#D97706', bg: '#FEF3C7', icon: 'UserCheck' },
+  flag:     { label: 'Flag',      color: '#C62828', bg: '#FEE2E2', icon: 'Flag' },
+};
+
+const STEP_ICONS = {
+  Cpu, Database, Brain, Mic, Activity, GitBranch, FileEdit, Send, UserCheck, Flag, Eye, MessageSquare, Zap
+};
+
+const PROCESS_DEFS = {
+  felix: {
+    title: 'F&I Sparring Session — GAP Presentation',
+    subject: 'Tyler M. · Chevrolet Lafayette · Scenario: GAP v3',
+    summary: 'FELIX runs a live sparring drill with a service-advisor, grading 5 dimensions in real time and enforcing compliance language guardrails.',
+    steps: [
+      { id: 1, type: 'system', label: 'Initialize sparring session', source: 'FELIX Core',
+        toolCall: 'POST /ade/felix/sessions', status: '200 OK · 142ms',
+        reasoning: 'Agent Tyler M. was queued for GAP reinforcement — March F&I PVR ran 18% below group mean on insurance products.',
+        output: 'session_id: sp_8a2f · scenario: gap_objection_v3 · difficulty: medium', duration: 1400 },
+      { id: 2, type: 'read', label: 'Pull agent training history', source: 'HR Service (Workday)',
+        toolCall: 'GET /hr/agents/TM-2034/training',
+        reasoning: '12 prior spars, avg score 87.4. Weakness profile: price-based objections on insurance-class products.',
+        output: '{ spars: 12, avg: 87, weakest: "price_objection_vsc" }', duration: 900 },
+      { id: 3, type: 'read', label: 'Load scenario from knowledge base', source: 'Neuralogic KB (Pinecone)',
+        toolCall: 'vector_search("gap objection ladder")',
+        reasoning: 'Retrieved 7-beat objection ladder authored by Rick — uses Rohrman\'s own coaching playbook as ground truth, not a generic LLM script.',
+        output: 'scenario: 7 beats, 3 compliance rules, 5 scoring rubrics', duration: 1100 },
+      { id: 4, type: 'llm', label: 'Generate customer opening', source: 'Claude 4.7 (bespoke fine-tune)',
+        reasoning: 'Customer persona: 34-year-old, financing 72mo, first-time Accord buyer, budget-anchored.',
+        output: 'FELIX → "I don\'t really need GAP, do I? My insurance already covers the car."', duration: 1600, checkpoint: false },
+      { id: 5, type: 'listen', label: 'Capture agent response', source: 'Twilio Voice → Whisper STT',
+        reasoning: 'Live call audio transcribed with 94% confidence. Detecting disfluency, pace, hedge words.',
+        output: 'Tyler: "Well, GAP — Guaranteed Asset Protection — covers the difference between what you owe and what insurance pays if the car is totaled..."', duration: 2200 },
+      { id: 6, type: 'score', label: 'Score response on 5 dimensions', source: 'Scoring Engine',
+        reasoning: 'Rubric grades Accuracy, Product Knowledge, Objection Handling, Tone, Compliance. Thresholds from Rick\'s playbook.',
+        output: 'Accuracy 92 · Knowledge 88 · Objection 84 · Tone 90 · Compliance 100 · overall 90.8', duration: 900 },
+      { id: 7, type: 'decision', label: 'Select next objection beat', source: 'FELIX Core',
+        reasoning: 'Agent handled definition well. Per ladder, deploy the price-anchor objection next — Tyler\'s known weak point.',
+        output: 'next_beat: price_anchor', duration: 600 },
+      { id: 8, type: 'llm', label: 'Deliver price objection', source: 'Claude 4.7',
+        reasoning: 'Pressure-test price framing without breaking role. Holds customer persona.',
+        output: 'FELIX → "That sounds expensive. What does this thing actually cost me?"', duration: 1400 },
+      { id: 9, type: 'listen', label: 'Capture agent response', source: 'Twilio → Whisper',
+        output: 'Tyler: "About three or four bucks a month rolled into your payment. It\'s basically a warranty against being upside-down..."', duration: 2400 },
+      { id: 10, type: 'flag', label: 'Compliance violation detected', source: 'Compliance Guard',
+        reasoning: 'Rule #1 (from Rohrman policy): never use "warranty" for GAP — triggers CFPB exposure. Flagging in real time.',
+        output: '🚩 term="warranty" @ 00:02:14 · severity: HIGH', duration: 700, flag: true },
+      { id: 11, type: 'human', label: 'Supervisor review checkpoint', source: 'Rick · Group Training Lead',
+        reasoning: 'Customer wanted visible stop-points. Session pauses here for human to continue, intervene, or end.',
+        output: 'Awaiting decision: [Continue] · [Coach Now] · [End & Retake]', duration: 0, checkpoint: true, requiresHuman: true },
+      { id: 12, type: 'llm', label: 'Generate in-session coaching nudge', source: 'Claude 4.7',
+        reasoning: 'Reinforcement is strongest when correction happens in-flow. Feed Tyler the compliant reframe before the next beat.',
+        output: 'Whisper prompt → "Swap \'warranty\' for \'protection\' and re-land the 3-4/mo anchor."', duration: 1100 },
+      { id: 13, type: 'llm', label: 'Deliver "I already have insurance"', source: 'Claude 4.7',
+        output: 'FELIX → "My regular insurance should cover me though, right?"', duration: 1400 },
+      { id: 14, type: 'listen', label: 'Capture agent response', source: 'Twilio → Whisper',
+        output: 'Tyler: "Your insurance pays the actual cash value — but you owe the loan balance. GAP covers that gap..."', duration: 2300 },
+      { id: 15, type: 'score', label: 'Final session scoring', source: 'Scoring Engine',
+        output: 'Final: 89/100 · Pass · 1 compliance flag · Recommend follow-up drill in 7 days', duration: 1000 },
+      { id: 16, type: 'write', label: 'Persist results to data lake', source: 'Snowflake + HR',
+        toolCall: 'INSERT training.sessions + PATCH /hr/agents/TM-2034',
+        output: 'session_id: sp_8a2f written · HR profile updated · drill scheduled', duration: 900 },
+      { id: 17, type: 'send', label: 'Dispatch coaching plan', source: 'SendGrid + Slack',
+        output: 'Email → Tyler · Slack ping → Rick · calendar hold → Thu 10a', duration: 700 },
+    ],
+  },
+  nova: {
+    title: 'Inbound Lead Response — VinSolutions Webhook',
+    subject: 'Darnell W. · 2024 Honda Accord EX · Fishers Honda',
+    summary: 'NOVA ingests a web lead, reads CRM + service history, drafts a personalized SMS, and routes follow-up — all under 45 seconds.',
+    steps: [
+      { id: 1, type: 'system', label: 'Webhook received from VinSolutions', source: 'VinSolutions CRM',
+        toolCall: 'POST /ade/nova/lead-intake',
+        output: 'lead_id: L-2026-41782 · source: dealer_site · vehicle: 2024 Accord EX', duration: 400 },
+      { id: 2, type: 'read', label: 'Fetch customer profile', source: 'VinSolutions',
+        toolCall: 'GET /crm/customers/CU-884412',
+        reasoning: 'Returning customer — bought a 2019 CR-V in 2019, 4 service visits since, last was April 2025.',
+        output: '{ name: "Darnell W.", prior_purchase: true, last_service: "2025-04-14", loyalty: "gold" }', duration: 900 },
+      { id: 3, type: 'read', label: 'Pull service & recall history', source: 'CDK Global (DMS)',
+        toolCall: 'GET /dms/customers/CU-884412/service',
+        output: '4 ROs, $2,480 lifetime svc. 1 open recall (airbag). No warranty issues.', duration: 1100 },
+      { id: 4, type: 'read', label: 'Market price for requested unit', source: 'Snowflake (MarketScan feed)',
+        toolCall: 'SELECT avg_sold FROM market.comps WHERE model=...',
+        output: 'Accord EX comps: $31,840 avg retail · $33,200 list is $1,360 over', duration: 800 },
+      { id: 5, type: 'llm', label: 'Score lead & infer intent', source: 'Claude 4.7',
+        reasoning: 'Gold-loyalty buyer, prior Honda, active service customer, timed their inquiry after a test-drive schedule window. High conversion probability.',
+        output: 'intent: strong_buy · score: 87 (HOT) · recommend: same-day test drive', duration: 1200 },
+      { id: 6, type: 'decision', label: 'Route: autonomous reply or BDC escalation', source: 'NOVA Core',
+        reasoning: 'Score > 80 and identity verified. Route to autonomous SMS; notify BDC in parallel.',
+        output: 'route: auto_sms_then_bdc_tail', duration: 500 },
+      { id: 7, type: 'llm', label: 'Draft personalized SMS', source: 'Claude 4.7',
+        reasoning: 'Reference the CR-V, acknowledge loyalty, propose specific window, avoid price-war opener.',
+        output: '"Hey Darnell — Jen at Fishers Honda here. Great to see you looking at the Accord EX. Since you\'re due out of your CR-V, want me to hold one for a test drive today 4pm or Saturday 10a?"', duration: 1300 },
+      { id: 8, type: 'human', label: 'Compliance review (deployment phase 1)', source: 'GM approval',
+        reasoning: 'During the first 30 days NOVA\'s outbound messages pass a human gate. After month 1 this runs autonomously.',
+        output: 'Awaiting [Send] · [Edit] · [Reject]', duration: 0, checkpoint: true, requiresHuman: true },
+      { id: 9, type: 'send', label: 'Send SMS via Twilio', source: 'Twilio',
+        toolCall: 'POST /messaging → +1 317 555 0184',
+        output: 'SID SM1a8f · delivered 12:42:03 · under-45s SLA met (38s)', duration: 800 },
+      { id: 10, type: 'write', label: 'Log activity back to CRM', source: 'VinSolutions',
+        toolCall: 'PATCH /crm/leads/L-2026-41782',
+        output: 'activity logged · owner: NOVA · next_action: reply_monitor_15m', duration: 700 },
+      { id: 11, type: 'decision', label: 'Schedule 3-touch cadence', source: 'NOVA Core',
+        reasoning: 'If no reply in 15m → follow-up SMS. If no reply 3h → email. 24h → escalate to human BDC.',
+        output: 'cadence armed · drop-off handoff: BDC @ Fishers Honda', duration: 600 },
+      { id: 12, type: 'write', label: 'Warm handoff packet to BDC', source: 'Slack',
+        output: '#bdc-fishers · thread with full context, price comps, and test-drive slots', duration: 500 },
+    ],
+  },
+  merch: {
+    title: 'New Inventory → Live VDP Publish',
+    subject: '2023 Toyota Camry LE · VIN 4T1BZ1HK... · Toyota Lafayette',
+    summary: 'MERCH pulls a just-stocked unit, audits photos, fetches market comps, recommends price, and publishes to DealerOn + syndication.',
+    steps: [
+      { id: 1, type: 'system', label: 'New inventory event', source: 'CDK Inventory',
+        output: 'stock_no: T29441 · received 09:14 · status: awaiting_recon', duration: 400 },
+      { id: 2, type: 'read', label: 'Decode VIN + trim', source: 'NHTSA vPIC',
+        toolCall: 'GET /vpic/decodevin/4T1BZ1HK...',
+        output: '2023 Camry LE · 2.5L I4 · FWD · 32,141 mi · clean title', duration: 600 },
+      { id: 3, type: 'read', label: 'Fetch photos from photo vendor', source: 'Spiffy API',
+        toolCall: 'GET /spiffy/vehicles/T29441/media',
+        output: '17 photos · 3 video clips · 8 exterior, 6 interior, 3 odo/VIN', duration: 900 },
+      { id: 4, type: 'llm', label: 'Vision audit: photos + spec match', source: 'Claude Vision',
+        reasoning: 'Check for hero shot, reflections, missing angles, and spec discrepancies vs. window sticker.',
+        output: 'hero_shot: ✓ · missing: rear 3/4 · spec match: ✓ · reshoot_required: minor', duration: 1400 },
+      { id: 5, type: 'decision', label: 'Photos pass gate?', source: 'MERCH Core',
+        reasoning: 'Minor gap is acceptable — publish now, queue reshoot ticket rather than block.',
+        output: 'decision: publish_with_reshoot_ticket', duration: 400 },
+      { id: 6, type: 'read', label: 'Pull market comps', source: 'MarketScan + Snowflake',
+        toolCall: 'SELECT comps WHERE year=2023 AND model="Camry LE" AND radius=50mi',
+        output: '42 comps · median $28,995 · days-to-sell: 19 · demand index 112', duration: 1000 },
+      { id: 7, type: 'llm', label: 'Recommend list price', source: 'Claude 4.7',
+        reasoning: 'Below median accelerates turn; this unit has below-avg miles so we can list at median. Target 14-day sell.',
+        output: 'recommend_list: $28,995 · floor: $27,900 · expected_DTS: 14', duration: 1100 },
+      { id: 8, type: 'human', label: 'Pricing manager approval', source: 'GM approval',
+        reasoning: 'Client requested visible checkpoint on price decisions until trust is established.',
+        output: 'Awaiting [Approve] · [Adjust] · [Hold]', duration: 0, checkpoint: true, requiresHuman: true },
+      { id: 9, type: 'write', label: 'Publish to DealerOn VDP', source: 'DealerOn',
+        toolCall: 'POST /dealeron/vehicles',
+        output: 'VDP live · URL: rohrmantoyota.com/inventory/T29441 · SEO meta set', duration: 900 },
+      { id: 10, type: 'write', label: 'Syndicate to third-party sites', source: 'Homenet feed',
+        output: 'AutoTrader ✓ · Cars.com ✓ · CarGurus ✓ · Facebook Marketplace ✓', duration: 1200 },
+      { id: 11, type: 'write', label: 'Open reshoot ticket', source: 'Spiffy',
+        output: 'ticket #PH-8841 · reshoot: rear 3/4 · due: 24h', duration: 500 },
+      { id: 12, type: 'write', label: 'Log publication event', source: 'Snowflake',
+        output: 'merch.publications row inserted · end-to-end 7m42s', duration: 500 },
+    ],
+  },
+  aria: {
+    title: 'Inbound Service Intake — Scheduling',
+    subject: 'Sarah L. · 2021 RAV4 · Toyota Lafayette',
+    summary: 'ARIA answers an inbound chat, confirms identity, pulls open ROs and recalls, books service, and issues confirmations.',
+    steps: [
+      { id: 1, type: 'system', label: 'Inbound chat opened', source: 'Dealer.com Chat',
+        output: 'session chat_9a2 · "I think I have a recall notice..."', duration: 400 },
+      { id: 2, type: 'llm', label: 'Classify intent', source: 'Claude 4.7',
+        output: 'intent: recall_inquiry + service_schedule · sentiment: calm', duration: 700 },
+      { id: 3, type: 'read', label: 'Identify customer', source: 'CDK DMS',
+        toolCall: 'GET /dms/customers?phone=...',
+        output: 'matched CU-772341 · Sarah L. · VIN on file: 2T3W1RFV...', duration: 800 },
+      { id: 4, type: 'read', label: 'Check open recalls', source: 'NHTSA + OEM feed',
+        output: '1 open recall 24V-311 (fuel pump) · parts in stock', duration: 900 },
+      { id: 5, type: 'read', label: 'Pull service calendar', source: 'CDK Service Scheduler',
+        output: 'next available: Thu 7:30a, 9:15a, 2:00p · tech cert: ✓', duration: 700 },
+      { id: 6, type: 'decision', label: 'Auto-book or advisor handoff?', source: 'ARIA Core',
+        reasoning: 'Simple recall, no warranty dispute, customer already identified. Safe to auto-book.',
+        output: 'decision: auto_book', duration: 400 },
+      { id: 7, type: 'write', label: 'Book appointment', source: 'CDK Service',
+        toolCall: 'POST /dms/service/appointments',
+        output: 'appt APT-44819 · Thu 9:15a · tech #412 · loaner: requested', duration: 900 },
+      { id: 8, type: 'write', label: 'Reserve loaner', source: 'Loaner Mgmt',
+        output: 'loaner LN-221 held · pickup counter D', duration: 500 },
+      { id: 9, type: 'send', label: 'Confirm via SMS + email', source: 'Twilio + SendGrid',
+        output: 'SMS delivered · email delivered · ICS attached', duration: 700 },
+      { id: 10, type: 'write', label: 'Sync to CRM activity', source: 'VinSolutions',
+        output: 'activity logged · owner: ARIA · follow-up: post-service CSAT', duration: 500 },
+    ],
+  },
+  scout: {
+    title: 'Acquisition Recommendation — Used Inventory',
+    subject: 'Toyota Lafayette · Used desk',
+    summary: 'SCOUT scans sales velocity, live auction feeds and market signals, then proposes specific units with max-bid prices for the used car manager.',
+    steps: [
+      { id: 1, type: 'read', label: 'Pull 90-day sales velocity', source: 'Snowflake',
+        output: 'Camry LE turning 11d · RAV4 Hybrid 9d · Tacoma 14d · gaps: RAV4 Hybrid', duration: 900 },
+      { id: 2, type: 'read', label: 'Pull current stocking levels', source: 'CDK Inventory',
+        output: 'Camry LE: 6 in-stock · RAV4 Hybrid: 1 (critical) · Tacoma: 4', duration: 700 },
+      { id: 3, type: 'read', label: 'Scan Manheim + ADESA feeds', source: 'Manheim API',
+        toolCall: 'GET /manheim/search?model="RAV4 Hybrid"',
+        output: '23 candidates in 300-mi radius · 4 under target · auction window: Thu', duration: 1200 },
+      { id: 4, type: 'llm', label: 'Rank candidates vs. playbook', source: 'Claude 4.7',
+        reasoning: 'Weight: miles, grade, options, prior-damage, transport cost. Apply Rohrman condition guardrails (Rick\'s playbook).',
+        output: 'top 3: VIN ...4921 (best), ...8814, ...2203', duration: 1300 },
+      { id: 5, type: 'llm', label: 'Compute max-bid prices', source: 'Claude 4.7',
+        reasoning: 'Target front gross $1,800 + recon $1,200 + transport $380 + pack $600 → max buy $24,820 on lead unit.',
+        output: 'unit_1 max: $24,820 · unit_2 $24,100 · unit_3 $23,950', duration: 900 },
+      { id: 6, type: 'human', label: 'Used car manager approval', source: 'GM approval',
+        output: 'Awaiting [Approve All] · [Approve 1] · [Reject]', duration: 0, checkpoint: true, requiresHuman: true },
+      { id: 7, type: 'write', label: 'Post bid to Manheim', source: 'Manheim',
+        toolCall: 'POST /manheim/bids',
+        output: '3 proxy bids placed · alerts on · auction Thu 1:00p ET', duration: 800 },
+      { id: 8, type: 'send', label: 'Notify used desk', source: 'Slack',
+        output: '#used-desk-lafayette · thread with comps, condition reports, max-bids', duration: 500 },
+    ],
+  },
+};
 
 // ── UTILITIES ────────────────────────────────────────────────────────────────
 
@@ -459,8 +680,46 @@ const ADECard = ({ ade, running, onToggle, onDrillDown }) => {
   );
 };
 
+const NowRunningHero = ({ onDrillDown }) => {
+  const processable = ADE_DEFS.filter(a => ADE_PROCESS_KEY[a.id]);
+  const [pick, setPick] = useState(processable[0].id);
+  const ade = ADE_DEFS.find(a => a.id === pick);
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-base font-semibold text-[#0A1F44] flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#FEE2E2] border border-[#FCA5A5]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C62828] pulse-dot" />
+              <span className="text-[10px] font-bold text-[#C62828] uppercase tracking-wider">ON AIR</span>
+            </span>
+            Autonomous Process — Live Run
+          </h2>
+          <p className="text-[12px] text-[#6B7280] mt-0.5">Watch the AI work step-by-step. Pause, rewind, and drill into every tool call or decision.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 rounded-md border border-[#E2E6EA] bg-white p-0.5">
+            {processable.map(a => (
+              <button key={a.id} onClick={() => setPick(a.id)}
+                className={cn('px-2.5 py-1 rounded text-[11px] font-semibold transition-colors flex items-center gap-1',
+                  pick === a.id ? 'bg-[#0A1F44] text-white' : 'text-[#6B7280] hover:text-[#374151]')}>
+                <span>{a.icon}</span>{a.name}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => onDrillDown(pick)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#EEF2F9] text-[#0A1F44] text-[11px] font-semibold hover:bg-[#d6e0f2] border border-[#c8d3e8]">
+            Open full view <ChevronRight size={11} />
+          </button>
+        </div>
+      </div>
+      <ProcessRunner key={pick} processKey={ADE_PROCESS_KEY[ade.id]} compact />
+    </div>
+  );
+};
+
 const CommandCenter = ({ adeStates, onToggle, onDrillDown }) => (
   <div className="space-y-6">
+    <NowRunningHero onDrillDown={onDrillDown} />
     <div>
       <SectionHeader title="Platform Overview" sub="Live operational metrics — all active ADEs" />
       <div className="flex gap-3">
@@ -483,6 +742,333 @@ const CommandCenter = ({ adeStates, onToggle, onDrillDown }) => (
     </div>
   </div>
 );
+
+// ── PROCESS RUNNER ───────────────────────────────────────────────────────────
+// Interactive, stepped view of an autonomous AI workflow. Clients can play,
+// pause, step, rewind, restart, and drill into every decision the agent makes.
+
+const StepIcon = ({ type, size = 12, color }) => {
+  const meta = STEP_TYPES[type] || STEP_TYPES.system;
+  const Ico = STEP_ICONS[meta.icon] || Cpu;
+  return <Ico size={size} color={color || meta.color} />;
+};
+
+const ProcessControls = ({ playing, onPlay, onPause, onStep, onBack, onRestart, speed, setSpeed, mode, setMode, stepIdx, total }) => (
+  <div className="flex items-center gap-3 bg-white border border-[#E2E6EA] rounded-lg px-4 py-2.5" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+    <button onClick={onRestart} title="Restart" className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-[#F7F8FA] text-[#6B7280]">
+      <RotateCcw size={14} />
+    </button>
+    <button onClick={onBack} title="Step back" className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-[#F7F8FA] text-[#6B7280]">
+      <StepBack size={14} />
+    </button>
+    <button onClick={playing ? onPause : onPlay} title={playing ? 'Pause' : 'Play'}
+      className="w-10 h-10 rounded-full flex items-center justify-center bg-[#0A1F44] text-white hover:bg-[#0d2a5e] transition-colors">
+      {playing ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
+    </button>
+    <button onClick={onStep} title="Step forward" className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-[#F7F8FA] text-[#6B7280]">
+      <StepForward size={14} />
+    </button>
+    <div className="w-px h-6 bg-[#E2E6EA]" />
+    <div className="flex items-center gap-1">
+      <FastForward size={12} className="text-[#9CA3AF]" />
+      {[0.5, 1, 2].map(s => (
+        <button key={s} onClick={() => setSpeed(s)}
+          className={cn('px-2 py-1 rounded text-[10px] font-mono font-semibold',
+            speed === s ? 'bg-[#0A1F44] text-white' : 'text-[#6B7280] hover:bg-[#F7F8FA]')}>
+          {s}x
+        </button>
+      ))}
+    </div>
+    <div className="w-px h-6 bg-[#E2E6EA]" />
+    <div className="flex items-center gap-1 rounded-md border border-[#E2E6EA] p-0.5">
+      {[{k:'auto',l:'Autonomous'},{k:'review',l:'Step-through Review'}].map(m => (
+        <button key={m.k} onClick={() => setMode(m.k)}
+          className={cn('px-2.5 py-1 rounded text-[10px] font-semibold transition-colors',
+            mode === m.k ? 'bg-[#EEF2F9] text-[#0A1F44]' : 'text-[#6B7280] hover:text-[#374151]')}>
+          {m.l}
+        </button>
+      ))}
+    </div>
+    <div className="flex-1" />
+    <div className="text-[11px] font-mono text-[#6B7280]">
+      Step <span className="font-semibold text-[#0A1F44]">{stepIdx + 1}</span> / {total}
+    </div>
+  </div>
+);
+
+const TimelineStep = ({ step, idx, current, doneBefore, flagged, onClick }) => {
+  const meta = STEP_TYPES[step.type] || STEP_TYPES.system;
+  const done = idx < current;
+  const active = idx === current;
+  return (
+    <button onClick={onClick}
+      className={cn('w-full flex gap-3 items-start text-left px-2 py-2 rounded-md transition-all border-l-2',
+        active ? 'bg-[#EEF2F9] border-[#0A1F44]' : doneBefore ? 'border-transparent hover:bg-[#F7F8FA]' : 'border-transparent opacity-70 hover:opacity-100')}>
+      <div className="relative flex-shrink-0 mt-0.5">
+        <div className={cn('w-6 h-6 rounded-full flex items-center justify-center',
+          done ? 'bg-[#DCFCE7]' : active ? 'bg-white ring-2 ring-[#0A1F44] ring-offset-1' : 'bg-[#F3F4F6]',
+          flagged && done ? 'bg-[#FEE2E2]' : '')}
+          style={active ? { animation: 'pulse-dot 2s ease-in-out infinite' } : undefined}>
+          {done ? (
+            flagged ? <Flag size={11} color="#C62828" /> : <CheckCircle size={11} color="#1B8A4C" />
+          ) : active ? (
+            <StepIcon type={step.type} size={11} />
+          ) : (
+            <StepIcon type={step.type} size={11} color="#9CA3AF" />
+          )}
+        </div>
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <span className="text-[9px] font-mono text-[#9CA3AF]">#{String(idx + 1).padStart(2,'0')}</span>
+          <span className="text-[9px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded"
+            style={{ color: meta.color, background: meta.bg }}>{meta.label}</span>
+          {step.requiresHuman && <span className="text-[9px] font-semibold text-[#D97706]">CHECKPOINT</span>}
+        </div>
+        <div className={cn('text-[11px] leading-snug', active ? 'text-[#0A1F44] font-semibold' : 'text-[#374151]')}>
+          {step.label}
+        </div>
+        {step.source && <div className="text-[10px] text-[#9CA3AF] font-mono mt-0.5 truncate">{step.source}</div>}
+      </div>
+    </button>
+  );
+};
+
+const StepDetail = ({ step, idx, total, progress, onApprove, onOverride, waiting }) => {
+  const meta = STEP_TYPES[step.type] || STEP_TYPES.system;
+  return (
+    <div className="bg-white border border-[#E2E6EA] rounded-lg overflow-hidden flex-1 flex flex-col" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+      <div className="px-5 py-4 border-b border-[#E2E6EA]" style={{ background: meta.bg + '60' }}>
+        <div className="flex items-center gap-2 mb-1.5">
+          <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: meta.bg, color: meta.color }}>
+            <StepIcon type={step.type} size={15} />
+          </div>
+          <span className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: meta.color }}>
+            Step {idx + 1} of {total} · {meta.label}
+          </span>
+          {step.flag && <span className="ml-auto px-2 py-0.5 rounded-full bg-[#FEE2E2] text-[#C62828] text-[10px] font-bold uppercase tracking-wider">Flag raised</span>}
+        </div>
+        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 600, color: NAVY, lineHeight: 1.1 }}>
+          {step.label}
+        </h3>
+        {step.source && (
+          <div className="flex items-center gap-1.5 mt-2 text-[11px] text-[#6B7280]">
+            <Database size={11} /><span className="font-mono">{step.source}</span>
+          </div>
+        )}
+      </div>
+      <div className="px-5 py-4 space-y-3 flex-1 overflow-y-auto">
+        {step.toolCall && (
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-semibold mb-1 flex items-center gap-1.5">
+              <Terminal size={10} /> Tool Call
+            </div>
+            <div className="bg-[#0A1F44] text-[#B3C4E3] rounded-md px-3 py-2 font-mono text-[11px] whitespace-pre-wrap break-all">
+              {step.toolCall}
+              {step.status && <span className="ml-2 text-[#6EE7B7]">› {step.status}</span>}
+            </div>
+          </div>
+        )}
+        {step.reasoning && (
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-semibold mb-1 flex items-center gap-1.5">
+              <Brain size={10} /> AI Reasoning
+            </div>
+            <div className="border-l-2 border-[#7C3AED] bg-[#F3E8FF]/40 rounded-r-md px-3 py-2 text-[12px] text-[#374151] leading-relaxed italic">
+              "{step.reasoning}"
+            </div>
+          </div>
+        )}
+        {step.output && (
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-semibold mb-1 flex items-center gap-1.5">
+              <FileEdit size={10} /> Output
+            </div>
+            <div className="bg-[#F7F8FA] border border-[#E2E6EA] rounded-md px-3 py-2 font-mono text-[11px] text-[#0A1F44] whitespace-pre-wrap break-words">
+              {step.output}
+            </div>
+          </div>
+        )}
+        {step.duration > 0 && (
+          <div className="pt-1">
+            <div className="flex items-center justify-between text-[10px] text-[#9CA3AF] font-mono mb-1">
+              <span>Execution</span>
+              <span>{Math.round(progress * step.duration)}ms / {step.duration}ms</span>
+            </div>
+            <div className="h-1 bg-[#E2E6EA] rounded-full overflow-hidden">
+              <div className="h-full rounded-full" style={{ width: `${Math.min(100, progress * 100)}%`, background: meta.color, transition: 'width 0.15s linear' }} />
+            </div>
+          </div>
+        )}
+        {step.requiresHuman && waiting && (
+          <div className="mt-3 p-3 rounded-lg border border-[#FEF3C7] bg-[#FFFBEB]">
+            <div className="flex items-center gap-2 mb-2">
+              <UserCheck size={14} color={AMBER} />
+              <span className="text-[12px] font-semibold text-[#92400E]">Human review requested</span>
+            </div>
+            <div className="text-[11px] text-[#78350F] mb-3">
+              Process is paused for review — advance when ready, or override the recommendation.
+            </div>
+            <div className="flex gap-2">
+              <button onClick={onApprove} className="px-3 py-1.5 rounded-md bg-[#1B8A4C] text-white text-[11px] font-semibold hover:bg-[#15713d]">Approve & Continue</button>
+              <button onClick={onOverride} className="px-3 py-1.5 rounded-md border border-[#E2E6EA] text-[11px] font-semibold text-[#6B7280] hover:bg-white">Override</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const ProcessEventStream = ({ log }) => (
+  <div className="bg-[#0A1F44] rounded-lg overflow-hidden border border-[#0d2a5e]" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+    <div className="px-3 py-1.5 border-b border-[#1c3262] flex items-center gap-2">
+      <CircleDot size={10} className="text-[#6EE7B7]" />
+      <span className="text-[10px] uppercase tracking-widest text-[#B3C4E3] font-semibold">Event Stream</span>
+      <span className="text-[10px] text-[#6B80A8] font-mono ml-auto">{log.length} events</span>
+    </div>
+    <div className="px-3 py-2 max-h-[96px] overflow-y-auto font-mono text-[10.5px] space-y-0.5">
+      {log.length === 0 && <div className="text-[#6B80A8] italic">Waiting for process to start...</div>}
+      {log.slice(0, 10).map((e, i) => (
+        <div key={e.id} className="flex gap-2 slide-in" style={{ opacity: i === 0 ? 1 : Math.max(0.35, 1 - i * 0.08) }}>
+          <span className="text-[#6B80A8] flex-shrink-0">{e.ts}</span>
+          <span className="text-[#6EE7B7] flex-shrink-0 w-14 truncate">[{e.type}]</span>
+          <span className="text-[#E2E6EA] truncate">{e.msg}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const ProcessRunner = ({ processKey, compact = false }) => {
+  const proc = PROCESS_DEFS[processKey];
+  const [idx, setIdx] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [speed, setSpeed] = useState(1);
+  const [mode, setMode] = useState('auto');
+  const [waiting, setWaiting] = useState(false);
+  const [log, setLog] = useState([]);
+  const rafRef = useRef(null);
+  const lastTs = useRef(null);
+
+  const pushEvent = useCallback((type, msg) => {
+    setLog(p => [{ id: Date.now() + Math.random(), ts: new Date().toLocaleTimeString('en-US', { hour12: false }), type, msg }, ...p].slice(0, 40));
+  }, []);
+
+  useEffect(() => {
+    setIdx(0); setProgress(0); setPlaying(true); setWaiting(false); setLog([]);
+  }, [processKey]);
+
+  useEffect(() => {
+    if (!proc) return;
+    const step = proc.steps[idx];
+    if (!step) return;
+
+    if (step.requiresHuman) {
+      setWaiting(true); setPlaying(false); setProgress(1);
+      pushEvent(step.type.toUpperCase(), `⏸ Checkpoint — ${step.label}`);
+      return;
+    }
+
+    if (!playing) return;
+    const dur = Math.max(200, (step.duration || 800) / speed);
+    lastTs.current = null;
+    const tick = (ts) => {
+      if (lastTs.current == null) lastTs.current = ts;
+      const elapsed = ts - lastTs.current;
+      const p = Math.min(1, elapsed / dur);
+      setProgress(p);
+      if (p >= 1) {
+        pushEvent(step.type.toUpperCase(), `✓ ${step.label}`);
+        if (idx + 1 < proc.steps.length) {
+          if (mode === 'review') {
+            setPlaying(false); setIdx(idx + 1); setProgress(0);
+          } else {
+            setIdx(idx + 1); setProgress(0);
+          }
+        } else {
+          setPlaying(false);
+          pushEvent('SYSTEM', '◆ Process complete');
+        }
+      } else {
+        rafRef.current = requestAnimationFrame(tick);
+      }
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [idx, playing, speed, proc, mode, pushEvent]);
+
+  if (!proc) return <div className="p-6 text-sm text-[#6B7280]">No process defined for this ADE.</div>;
+
+  const currentStep = proc.steps[idx];
+  const stepDone = proc.steps.slice(0, idx).some(s => s.flag);
+
+  const handleApprove = () => {
+    setWaiting(false); setProgress(0);
+    pushEvent('HUMAN', `▶ Approved: ${currentStep.label}`);
+    if (idx + 1 < proc.steps.length) { setIdx(idx + 1); setPlaying(true); }
+  };
+  const handleOverride = () => {
+    setWaiting(false); setProgress(0);
+    pushEvent('HUMAN', `✖ Overridden: ${currentStep.label}`);
+    if (idx + 1 < proc.steps.length) { setIdx(idx + 1); setPlaying(true); }
+  };
+
+  const handleRestart = () => {
+    setIdx(0); setProgress(0); setPlaying(true); setWaiting(false); setLog([]);
+    pushEvent('SYSTEM', '↻ Process restarted');
+  };
+  const handleStep = () => {
+    if (waiting) { handleApprove(); return; }
+    if (idx + 1 < proc.steps.length) { setIdx(idx + 1); setProgress(0); setPlaying(false); }
+  };
+  const handleBack = () => {
+    if (idx > 0) { setIdx(idx - 1); setProgress(0); setPlaying(false); setWaiting(false); }
+  };
+
+  return (
+    <div className="space-y-3 fade-up">
+      <div className="flex items-center justify-between bg-white border border-[#E2E6EA] rounded-lg p-4" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1B8A4C] pulse-dot" />
+            <span className="text-[10px] uppercase tracking-widest font-semibold text-[#1B8A4C]">Live Autonomous Process</span>
+          </div>
+          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 600, color: NAVY, lineHeight: 1.1 }}>{proc.title}</div>
+          <div className="text-[11px] text-[#6B7280] mt-1 font-mono">{proc.subject}</div>
+        </div>
+        <div className="text-right max-w-sm">
+          <div className="text-[10px] uppercase tracking-widest font-semibold text-[#9CA3AF] mb-0.5">What's happening</div>
+          <div className="text-[11px] text-[#374151] leading-snug">{proc.summary}</div>
+        </div>
+      </div>
+      <ProcessControls playing={playing && !waiting} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+        onStep={handleStep} onBack={handleBack} onRestart={handleRestart}
+        speed={speed} setSpeed={setSpeed} mode={mode} setMode={setMode}
+        stepIdx={idx} total={proc.steps.length} />
+      <div className="grid gap-3" style={{ gridTemplateColumns: compact ? '280px 1fr' : '320px 1fr' }}>
+        <div className="bg-white border border-[#E2E6EA] rounded-lg p-2" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)', maxHeight: 520, overflowY: 'auto' }}>
+          <div className="text-[10px] uppercase tracking-widest font-semibold text-[#9CA3AF] px-2 py-1.5">Timeline · {proc.steps.length} steps</div>
+          <div className="space-y-0.5">
+            {proc.steps.map((s, i) => (
+              <TimelineStep key={s.id} step={s} idx={i} current={idx}
+                doneBefore={i < idx} flagged={s.flag}
+                onClick={() => { setIdx(i); setProgress(0); setPlaying(false); setWaiting(false); }} />
+            ))}
+          </div>
+        </div>
+        <div className="flex flex-col gap-3 min-h-[420px]">
+          <StepDetail step={currentStep} idx={idx} total={proc.steps.length} progress={progress}
+            onApprove={handleApprove} onOverride={handleOverride} waiting={waiting} />
+          <ProcessEventStream log={log} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ADE_PROCESS_KEY = { felix: 'felix', nova: 'nova', merch: 'merch', aria: 'aria', scout: 'scout' };
 
 // ── ADE DETAIL — TABS ────────────────────────────────────────────────────────
 
@@ -770,10 +1356,11 @@ const ScoreTab = () => (
 );
 
 const ADEDetail = ({ adeId, onBack }) => {
-  const [tab, setTab] = useState('Overview');
-  const [status, setStatus] = useState('Running');
   const ade = ADE_DEFS.find(a => a.id === adeId) || ADE_DEFS[1];
-  const TABS = ['Overview', 'Live Sessions', 'Spar Logs', 'Scoring', 'Compliance Rules', 'Configuration'];
+  const hasProcess = !!ADE_PROCESS_KEY[ade.id];
+  const TABS = (hasProcess ? ['Live Process'] : []).concat(['Overview', 'Live Sessions', 'Spar Logs', 'Scoring', 'Compliance Rules', 'Configuration']);
+  const [tab, setTab] = useState(TABS[0]);
+  const [status, setStatus] = useState('Running');
   return (
     <div>
       <div className="mb-5">
@@ -804,6 +1391,11 @@ const ADEDetail = ({ adeId, onBack }) => {
         </div>
       </div>
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
+      {tab === 'Live Process' && (
+        <div className="pt-4">
+          <ProcessRunner processKey={ADE_PROCESS_KEY[ade.id]} />
+        </div>
+      )}
       {tab === 'Overview' && <OverviewTab />}
       {tab === 'Live Sessions' && <LiveSessionsTab />}
       {tab === 'Spar Logs' && <SparLogsTab />}
